@@ -172,6 +172,7 @@ def generate_explanation(message):
 
     keyword_results = detect_suspicious_keywords(message)
     url_results = detect_suspicious_url_patterns(message)
+    ip_results = detect_ip_based_urls(message)
     risk_results = calculate_risk(message)
 
     reasons = []
@@ -186,10 +187,16 @@ def generate_explanation(message):
         reasons.append(
             "The message uses urgency or pressure tactics."
         )
+        recommendations.append(
+            "Do not let urgent language pressure you into acting quickly."
+        )
 
     if "account is blocked" in keyword_results or "account blocked" in keyword_results:
         reasons.append(
             "The message claims that an account is blocked."
+        )
+        recommendations.append(
+            "Check your account directly through the organization's official website."
         )
 
     if "verify your account" in keyword_results:
@@ -201,13 +208,14 @@ def generate_explanation(message):
         reasons.append(
             "The message contains potentially suspicious URL patterns."
         )
+        recommendations.append(
+            "Avoid clicking suspicious links. Visit the official website directly instead."
+        )
 
-        ip_results = detect_ip_based_urls(message)
-
-        if ip_results:
-            reasons.append(
-                "The message contains a URL that uses an IP address instead of a domain name."
-            )
+    if ip_results:
+        reasons.append(
+            "The message contains a URL that uses an IP address instead of a domain name."
+        )
 
     if "otp" in keyword_results:
         reasons.append(
@@ -217,50 +225,48 @@ def generate_explanation(message):
     if "password" in keyword_results:
         reasons.append(
             "The message requests sensitive login credentials."
-        )        
+        )
 
     if "bank details" in keyword_results:
         reasons.append(
             "The message requests sensitive banking information."
         )
 
+    if any(
+        keyword in keyword_results
+        for keyword in ["otp", "password", "bank details"]
+    ):
+        recommendations.append(
+            "Never share OTPs, passwords, or sensitive banking information."
+        )
+
     if risk_results["risk_level"] == "High":
-        recommendations = [
-            "Do not click suspicious links.",
-            "Never share passwords or OTPs.",
+        recommendations.extend([
             "Contact the organization through its official website or phone number.",
             "Report the suspicious message."
-        ]
+        ])
 
     elif risk_results["risk_level"] == "Medium":
-        recommendations = [
+        recommendations.extend([
             "Check the sender's identity carefully.",
-            "Avoid clicking unexpected links.",
-            "Never share sensitive information.",
             "Verify important claims through official channels."
-        ]
+        ])
 
     else:
-        recommendations = [
+        recommendations.extend([
             "Remain cautious when interacting with unexpected messages.",
-            "Check links and sender details before taking action.",
-            "Never share passwords or OTPs."
-        ]
-
-    ip_results = detect_ip_based_urls(message)
-
-    if ip_results:
-        reasons.append(
-            "The message contains a URL that uses an IP address instead of a domain name."
-        )
+            "Check links and sender details before taking action."
+        ])
 
     if not reasons:
         reasons.append(
             "No suspicious indicators from the current detection rules were found."
         )
 
+    # Remove duplicate recommendations while preserving order.
+    recommendations = list(dict.fromkeys(recommendations))
+
     return {
         "reasons": reasons,
         "recommendations": recommendations
     }
-

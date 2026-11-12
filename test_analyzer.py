@@ -126,3 +126,43 @@ assert result["score"] == 2
 print("Test 3 passed: Suspicious-pattern scoring.")
 
 print("All 3 risk scoring tests passed!")
+
+
+print("\nEXPLANATION TESTS")
+print("-----------------")
+
+# Test 1: Suspicious message explanation.
+result = generate_explanation(
+    "URGENT! Your account is blocked. Verify your account immediately using https://bank-verify.example.com/login"
+)
+
+assert any("urgency" in reason for reason in result["reasons"])
+assert any("account is blocked" in reason for reason in result["reasons"])
+assert any("suspicious URL" in reason for reason in result["reasons"])
+
+print("Test 1 passed: Threat explanations.")
+
+# Test 2: Sensitive information warning.
+result = generate_explanation(
+    "Your OTP and password are required. Please provide your bank details immediately."
+)
+
+assert any("OTP" in reason for reason in result["reasons"])
+assert any("login credentials" in reason for reason in result["reasons"])
+assert any("banking information" in reason for reason in result["reasons"])
+
+assert any("Never share OTPs" in recommendation for recommendation in result["recommendations"])
+
+print("Test 2 passed: Sensitive information warnings.")
+
+# Test 3: Ordinary message.
+result = generate_explanation(
+    "Hello! Hope you are having a wonderful day."
+)
+
+assert len(result["reasons"]) == 1
+assert "No suspicious indicators" in result["reasons"][0]
+
+print("Test 3 passed: Ordinary message.")
+
+print("All 3 explanation tests passed!")
