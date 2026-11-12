@@ -4,6 +4,7 @@ import streamlit as st
 from analyzer import (
     detect_suspicious_keywords,
     detect_suspicious_url_patterns,
+    detect_ip_based_urls,
     calculate_risk,
     generate_explanation
 )
@@ -48,6 +49,8 @@ if st.button("🔍 Analyze Message", use_container_width=True):
 
         url_results = detect_suspicious_url_patterns(message)
 
+        ip_results = detect_ip_based_urls(message)
+
         risk_results = calculate_risk(message)
 
         explanation_results = generate_explanation(message)
@@ -70,13 +73,15 @@ if st.button("🔍 Analyze Message", use_container_width=True):
             st.info("ℹ️ Low Risk - No major indicators detected")
 
         # Display score and detection counts
-        col1, col2, col3 = st.columns(3)
+        col1, col2, col3, col4 = st.columns(4)
 
         col1.metric("Risk Score", risk_results["score"])
 
         col2.metric("Suspicious Keywords", len(keyword_results))
 
         col3.metric("URL Patterns", len(url_results))
+
+        col4.metric("IP-Based URLs", len(ip_results))
 
         # Display detected keywords
         st.subheader("🔎 Detected Suspicious Keywords")
@@ -93,6 +98,12 @@ if st.button("🔍 Analyze Message", use_container_width=True):
         if url_results:
             for pattern in url_results:
                 st.write(f"⚠️ {pattern}")
+
+        if ip_results:
+            st.subheader("IP-Based URLs")
+
+            for ip_url in ip_results:
+                st.write(f"⚠️ {ip_url}")
         else:
             st.write("No suspicious URL patterns detected.")
 

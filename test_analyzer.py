@@ -2,6 +2,7 @@
 from analyzer import (
     detect_suspicious_keywords,
     detect_suspicious_url_patterns,
+    detect_ip_based_urls,
     calculate_risk,
     generate_explanation
 )
@@ -35,3 +36,29 @@ print("\nSAFETY RECOMMENDATIONS")
 
 for recommendation in explanation_results["recommendations"]:
     print("-", recommendation)
+
+print("\nIP-BASED URL DETECTION TESTS")
+print("----------------------------")
+
+# Test 1: Valid IP-based URL
+test1 = detect_ip_based_urls(
+    "Visit http://192.168.1.10/login"
+)
+assert len(test1) == 1
+print("Test 1 passed: Valid IP URL detected.")
+
+# Test 2: Normal domain
+test2 = detect_ip_based_urls(
+    "Visit https://google.com/login"
+)
+assert len(test2) == 0
+print("Test 2 passed: Normal domain not flagged.")
+
+# Test 3: Invalid IP address
+test3 = detect_ip_based_urls(
+    "Visit http://256.300.1.5/login"
+)
+assert len(test3) == 0
+print("Test 3 passed: Invalid IP rejected.")
+
+print("\nAll IP detection tests passed!")

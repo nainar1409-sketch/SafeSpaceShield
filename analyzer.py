@@ -2,6 +2,8 @@
 # SafeSpace Shield - Detection Engine
 
 import re
+import ipaddress
+from urllib.parse import urlparse
 
 SUSPICIOUS_KEYWORDS = [
     "urgent",
@@ -67,6 +69,45 @@ def detect_suspicious_url_patterns(message):
     return detected_url_patterns
 
 
+def detect_ip_based_urls(message):
+
+    detected_ip_urls = []
+
+    # Extract URLs from the message
+    urls = re.findall(
+        r'https?://\S+|www\.\S+',
+        message.lower()
+    )
+
+    # Remove punctuation at the end
+    urls = [
+        url.rstrip(".,!?;:)")
+        for url in urls
+    ]
+
+    for url in urls:
+
+        # Extract the hostname
+        parsed_url = urlparse(
+            url if "://" in url else "//" + url
+        )
+
+        hostname = parsed_url.hostname
+
+        if hostname is None:
+            continue
+
+        try:
+            # Check whether hostname is a valid IP address
+            ipaddress.ip_address(hostname)
+
+            detected_ip_urls.append(url)
+
+        except ValueError:
+            continue
+
+    return detected_ip_urls
+
 
 
 def calculate_risk(message):
@@ -75,12 +116,18 @@ def calculate_risk(message):
 
     url_results = detect_suspicious_url_patterns(message)
 
+    ip_results = detect_ip_based_urls(message)
+
     sensitive_keywords = ["otp", "password", "bank details"]
 
-    score = sum(
-        3 if keyword in sensitive_keywords else 1
-        for keyword in keyword_results
-    ) + (len(url_results) * 2)
+    score = (
+        sum(
+            3 if keyword in sensitive_keywords else 1
+            for keyword in keyword_results
+        )
+        + (len(url_results) * 2)
+        + (len(ip_results) * 2)
+    )
 
     if score >= 5:
         risk_level = "High"
@@ -95,7 +142,8 @@ def calculate_risk(message):
         "score": score,
         "risk_level": risk_level,
         "keyword_count": len(keyword_results),
-        "url_pattern_count": len(url_results)
+        "url_pattern_count": len(url_results),
+        "ip_url_count": len(ip_results)
     }
 
 
@@ -132,6 +180,13 @@ def generate_explanation(message):
         reasons.append(
             "The message contains potentially suspicious URL patterns."
         )
+
+        ip_results = detect_ip_based_urls(message)
+
+        if ip_results:
+            reasons.append(
+                "The message contains a URL that uses an IP address instead of a domain name."
+            )
 
     if "otp" in keyword_results:
         reasons.append(
@@ -170,6 +225,13 @@ def generate_explanation(message):
             "Check links and sender details before taking action.",
             "Never share passwords or OTPs."
         ]
+
+    ip_results = detect_ip_based_urls(message)
+
+    if ip_results:
+        reasons.append(
+            "The message contains a URL that uses an IP address instead of a domain name."
+        )
 
     if not reasons:
         reasons.append(
