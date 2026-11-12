@@ -62,3 +62,40 @@ assert len(test3) == 0
 print("Test 3 passed: Invalid IP rejected.")
 
 print("\nAll IP detection tests passed!")
+
+print("\nADDITIONAL URL PATTERN TESTS")
+print("----------------------------")
+
+new_patterns = [
+    "account-suspended",
+    "verify-identity",
+    "password-reset",
+    "secure-login",
+    "update-payment",
+    "free-gift"
+]
+
+for pattern in new_patterns:
+    result = detect_suspicious_url_patterns(
+        f"Visit https://{pattern}.example.com/login"
+    )
+
+    assert pattern in result
+    print(f"Passed: {pattern}")
+
+print("\nFALSE POSITIVE TESTS")
+print("--------------------")
+
+assert detect_suspicious_url_patterns(
+    "I received a free-gift from my friend."
+) == []
+
+assert detect_suspicious_url_patterns(
+    "The words secure-login appeared in our meeting notes."
+) == []
+
+assert detect_suspicious_url_patterns(
+    "Visit https://google.com for information."
+) == []
+
+print("All 3 false-positive tests passed!")

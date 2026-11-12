@@ -28,7 +28,13 @@ SUSPICIOUS_URL_KEYWORDS = [
     "free-prize",
     "claim-reward",
     "login-verify",
-    "secure-update"
+    "secure-update",
+     "account-suspended",
+    "verify-identity",
+    "password-reset",
+    "secure-login",
+    "update-payment",
+    "free-gift"
 ]
 
 def detect_suspicious_keywords(message):
@@ -48,15 +54,16 @@ def detect_suspicious_url_patterns(message):
 
     message = message.lower()
 
-    # Extract actual URLs
+    # Extract URLs from the message
     urls = re.findall(
-        r'https?://\S+|www\.\S+',
-        message
+        r'''(?:https?://|www\.)[^\s<>"']+''',
+        message,
+        flags=re.IGNORECASE
     )
 
     # Remove punctuation at the end of URLs
     urls = [
-        url.rstrip(".,!?;:)")
+        url.rstrip(".,!?;:)]}")
         for url in urls
     ]
 
