@@ -29,7 +29,7 @@ SUSPICIOUS_URL_KEYWORDS = [
     "claim-reward",
     "login-verify",
     "secure-update",
-     "account-suspended",
+    "account-suspended",
     "verify-identity",
     "password-reset",
     "secure-login",
@@ -82,13 +82,14 @@ def detect_ip_based_urls(message):
 
     # Extract URLs from the message
     urls = re.findall(
-        r'https?://\S+|www\.\S+',
-        message.lower()
+        r'''(?:https?://|www\.)[^\s<>"']+''',
+        message,
+        flags=re.IGNORECASE
     )
 
     # Remove punctuation at the end
     urls = [
-        url.rstrip(".,!?;:)")
+        url.rstrip(".,!?;:)]}")
         for url in urls
     ]
 
@@ -117,6 +118,7 @@ def detect_ip_based_urls(message):
 
 
 
+
 def calculate_risk(message):
 
     keyword_results = detect_suspicious_keywords(message)
@@ -127,13 +129,24 @@ def calculate_risk(message):
 
     sensitive_keywords = ["otp", "password", "bank details"]
 
+    # Identify IP URLs that do not already contain
+    # a suspicious URL pattern.
+    ip_urls_without_pattern = [
+        url for url in ip_results
+        if not any(
+            pattern in url.lower()
+            for pattern in SUSPICIOUS_URL_KEYWORDS
+        )
+    ]
+
+    # Calculate risk score without double-counting.
     score = (
         sum(
             3 if keyword in sensitive_keywords else 1
             for keyword in keyword_results
         )
         + (len(url_results) * 2)
-        + (len(ip_results) * 2)
+        + (len(ip_urls_without_pattern) * 2)
     )
 
     if score >= 5:
@@ -152,6 +165,7 @@ def calculate_risk(message):
         "url_pattern_count": len(url_results),
         "ip_url_count": len(ip_results)
     }
+
 
 
 def generate_explanation(message):

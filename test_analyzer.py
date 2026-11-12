@@ -99,3 +99,30 @@ assert detect_suspicious_url_patterns(
 ) == []
 
 print("All 3 false-positive tests passed!")
+
+
+print("\nRISK SCORING TESTS")
+print("------------------")
+
+# Test 1: IP URL and suspicious pattern should not be double-counted.
+result = calculate_risk(
+    "Visit http://192.168.1.10/bank-verify/login"
+)
+assert result["score"] == 2
+print("Test 1 passed: No double-counting.")
+
+# Test 2: IP URL without suspicious pattern.
+result = calculate_risk(
+    "Visit http://192.168.1.10/login"
+)
+assert result["score"] == 2
+print("Test 2 passed: IP-only scoring.")
+
+# Test 3: Suspicious pattern without IP address.
+result = calculate_risk(
+    "Visit https://bank-verify.example.com/login"
+)
+assert result["score"] == 2
+print("Test 3 passed: Suspicious-pattern scoring.")
+
+print("All 3 risk scoring tests passed!")
