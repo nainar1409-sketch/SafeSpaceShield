@@ -166,3 +166,50 @@ assert "No suspicious indicators" in result["reasons"][0]
 print("Test 3 passed: Ordinary message.")
 
 print("All 3 explanation tests passed!")
+
+print("\nACCOUNT SUSPENSION TESTS")
+print("------------------------")
+
+messages = [
+    "Your account has been suspended.",
+    "Your account is suspended.",
+    "Your account access will be suspended."
+]
+
+expected_keywords = [
+    "account has been suspended",
+    "account is suspended",
+    "account access will be suspended"
+]
+
+for message, expected in zip(messages, expected_keywords):
+    result = detect_suspicious_keywords(message)
+
+    assert expected in result
+
+    print(f"Passed: {expected}")
+
+print("All 3 account suspension tests passed!")
+
+print("\nACCOUNT SUSPENSION EXPLANATION TEST")
+print("-----------------------------------")
+
+message = """
+Your account has been suspended.
+Restore access immediately:
+https://account-suspended.example.com/login
+"""
+
+result = generate_explanation(message)
+
+assert (
+    "The message claims that an account has been suspended or will be suspended."
+    in result["reasons"]
+)
+
+assert (
+    "Verify account suspension claims directly through the organization's official website."
+    in result["recommendations"]
+)
+
+print("Account suspension explanation test passed!")

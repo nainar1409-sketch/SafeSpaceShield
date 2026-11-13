@@ -18,7 +18,11 @@ SUSPICIOUS_KEYWORDS = [
     "claim your reward",
     "otp",
     "password",
-    "bank details"
+    "bank details",
+    "account has been suspended",
+    "account suspended",
+    "account is suspended",
+    "account access will be suspended",
 ]
 
 
@@ -199,6 +203,22 @@ def generate_explanation(message):
             "Check your account directly through the organization's official website."
         )
 
+    if any(
+        keyword in keyword_results
+        for keyword in [
+            "account has been suspended",
+            "account is suspended",
+            "account access will be suspended"
+        ]
+    ):
+        reasons.append(
+            "The message claims that an account has been suspended or will be suspended."
+        )
+        recommendations.append(
+            "Verify account suspension claims directly through the organization's official website."
+        )
+        
+
     if "verify your account" in keyword_results:
         reasons.append(
             "The message asks the recipient to verify an account."
@@ -270,3 +290,4 @@ def generate_explanation(message):
         "reasons": reasons,
         "recommendations": recommendations
     }
+
