@@ -307,3 +307,41 @@ for message, expected in zip(messages, expected_keywords):
     print(f"Passed: {expected}")
 
 print("All 3 impersonation tests passed!")
+
+print("\nBANK AND GOVERNMENT IMPERSONATION EXPLANATION TESTS")
+print("---------------------------------------------------")
+
+message = (
+    "We are from your bank. "
+    "Contact the bank security department. "
+    "Immediate government verification required."
+)
+
+result = generate_explanation(message)
+
+assert any(
+    "impersonating a bank" in reason
+    for reason in result["reasons"]
+)
+
+assert any(
+    "government verification claims" in reason
+    for reason in result["reasons"]
+)
+
+assert any(
+    "Contact your bank" in recommendation
+    for recommendation in result["recommendations"]
+)
+
+assert any(
+    "government website" in recommendation
+    for recommendation in result["recommendations"]
+)
+
+print("Bank impersonation explanation passed!")
+print("Government verification explanation passed!")
+print("Bank safety recommendation passed!")
+print("Government safety recommendation passed!")
+
+print("All impersonation explanation tests passed!")

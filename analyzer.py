@@ -279,6 +279,34 @@ def generate_explanation(message):
             "Contact the organization through its official website or phone number.",
             "Report the suspicious message."
         ])
+        # Bank impersonation warning
+    if any(
+        keyword in keyword_results
+        for keyword in [
+            "we are from your bank",
+            "bank security department"
+        ]
+    ):
+        reasons.append(
+            "The sender may be impersonating a bank or its security department."
+        )
+        recommendations.append(
+            "Contact your bank using the phone number on its official website or bank card."
+        )
+# Government verification warning
+    if any(
+        keyword in keyword_results
+        for keyword in [
+            "government verification required",
+            "immediate government verification"
+        ]
+    ):
+        reasons.append(
+        "The message uses government verification claims that could be intended to create false authority."
+        )
+        recommendations.append(
+            "Verify government-related requests directly through the official government website."
+        )
 
     elif risk_results["risk_level"] == "Medium":
         recommendations.extend([
