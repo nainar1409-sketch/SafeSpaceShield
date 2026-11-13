@@ -213,3 +213,38 @@ assert (
 )
 
 print("Account suspension explanation test passed!")
+
+print("\nDELIVERY SCAM KEYWORD TESTS")
+print("---------------------------")
+
+messages = [
+    "Your package is on hold.",
+    "Please pay the delivery fee.",
+    "A redelivery fee is required."
+]
+
+expected_keywords = [
+    "package is on hold",
+    "pay the delivery fee",
+    "redelivery fee"
+]
+
+for message, expected in zip(messages, expected_keywords):
+    result = detect_suspicious_keywords(message)
+
+    assert expected in result
+
+    print(f"Passed: {expected}")
+
+print("All 3 delivery scam tests passed!")
+
+print("\nDELIVERY URL PATTERN TEST")
+print("-------------------------")
+
+message = "Visit https://delivery-update.example.com/pay"
+
+result = detect_suspicious_url_patterns(message)
+
+assert "delivery-update" in result
+
+print("Delivery URL pattern test passed!")

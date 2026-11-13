@@ -23,6 +23,9 @@ SUSPICIOUS_KEYWORDS = [
     "account suspended",
     "account is suspended",
     "account access will be suspended",
+    "package is on hold",
+    "pay the delivery fee",
+    "redelivery fee",
 ]
 
 
@@ -38,7 +41,8 @@ SUSPICIOUS_URL_KEYWORDS = [
     "password-reset",
     "secure-login",
     "update-payment",
-    "free-gift"
+    "free-gift",
+    "delivery-update",
 ]
 
 def detect_suspicious_keywords(message):
