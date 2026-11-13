@@ -29,7 +29,11 @@ SUSPICIOUS_KEYWORDS = [
     "pay a processing fee",
     "release your payment",
     "payment will be cancelled",
-    
+    "we are from your bank",
+    "bank security department",
+    "government verification required",
+    "government verification",
+    "immediate government verification",
 ]
 
 
@@ -48,6 +52,7 @@ SUSPICIOUS_URL_KEYWORDS = [
     "free-gift",
     "delivery-update",
     "payment-release",
+    "bank-security-verify"
 ]
 
 def detect_suspicious_keywords(message):

@@ -283,3 +283,27 @@ result = detect_suspicious_url_patterns(message)
 assert "payment-release" in result
 
 print("Payment URL pattern test passed!")
+
+print("\nIMPERSONATION KEYWORD TESTS")
+print("---------------------------")
+
+messages = [
+    "We are from your bank.",
+    "Contact the bank security department.",
+    "Government verification required."
+]
+
+expected_keywords = [
+    "we are from your bank",
+    "bank security department",
+    "government verification required"
+]
+
+for message, expected in zip(messages, expected_keywords):
+    result = detect_suspicious_keywords(message)
+
+    assert expected in result
+
+    print(f"Passed: {expected}")
+
+print("All 3 impersonation tests passed!")
