@@ -26,6 +26,10 @@ SUSPICIOUS_KEYWORDS = [
     "package is on hold",
     "pay the delivery fee",
     "redelivery fee",
+    "pay a processing fee",
+    "release your payment",
+    "payment will be cancelled",
+    
 ]
 
 
@@ -43,6 +47,7 @@ SUSPICIOUS_URL_KEYWORDS = [
     "update-payment",
     "free-gift",
     "delivery-update",
+    "payment-release",
 ]
 
 def detect_suspicious_keywords(message):

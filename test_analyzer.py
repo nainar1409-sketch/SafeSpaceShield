@@ -248,3 +248,38 @@ result = detect_suspicious_url_patterns(message)
 assert "delivery-update" in result
 
 print("Delivery URL pattern test passed!")
+
+print("\nPAYMENT SCAM KEYWORD TESTS")
+print("--------------------------")
+
+messages = [
+    "You must pay a processing fee.",
+    "Click here to release your payment.",
+    "Your payment will be cancelled."
+]
+
+expected_keywords = [
+    "pay a processing fee",
+    "release your payment",
+    "payment will be cancelled"
+]
+
+for message, expected in zip(messages, expected_keywords):
+    result = detect_suspicious_keywords(message)
+
+    assert expected in result
+
+    print(f"Passed: {expected}")
+
+print("All 3 payment scam tests passed!")
+
+print("\nPAYMENT URL PATTERN TEST")
+print("------------------------")
+
+message = "Visit https://payment-release.example.com/verify"
+
+result = detect_suspicious_url_patterns(message)
+
+assert "payment-release" in result
+
+print("Payment URL pattern test passed!")
