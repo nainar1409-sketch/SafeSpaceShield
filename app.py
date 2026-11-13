@@ -13,30 +13,88 @@ from analyzer import (
 st.set_page_config(
     page_title="SafeSpace Shield",
     page_icon="🛡️",
-    layout="centered"
+    layout="wide",
+    initial_sidebar_state="collapsed"
 )
+
+# Sidebar
+with st.sidebar:
+    st.title("🛡️ SafeSpace Shield")
+
+    st.markdown("### About")
+
+    st.write(
+        "An intelligent cybersecurity awareness tool "
+        "that helps identify potential phishing and scam messages."
+    )
+
+    st.divider()
+
+    st.markdown("### Features")
+
+    st.markdown(
+        """
+        - Suspicious keyword detection
+        - URL pattern detection
+        - IP-based URL detection
+        - Risk scoring
+        - Safety recommendations
+        """
+    )
+
+    st.divider()
+
+    st.caption("Think Before You Click.")
+
+# Function to clear the message
+def clear_message():
+    st.session_state["message_input"] = ""
 
 # Application heading
 st.title("🛡️ SafeSpace Shield")
 
-st.subheader(
-    "Think Before You Click. Understand Before You Trust."
+st.markdown(
+    "### Think Before You Click. Understand Before You Trust."
 )
 
-st.write(
-    "Analyze suspicious messages, identify warning signs, "
-    "and learn how to stay safer online."
+st.markdown(
+    """
+    Your personal online safety companion.
+
+    Analyze suspicious SMS messages, emails, and links.
+    Understand potential threats and learn how to protect yourself.
+    """
 )
 
 st.divider()
 
 # Message input section
-st.header("Message Analyzer")
+st.header("🔍 Analyze a Message")
+
+st.write(
+    "Paste the message you want to check. "
+    "SafeSpace Shield will analyze it for potential warning signs."
+)
 
 message = st.text_area(
-    "Paste a suspicious message here:",
-    placeholder="Paste an SMS, email, or suspicious message...",
-    height=150
+    "Your message",
+    placeholder=(
+        "Example: Your bank account is blocked! "
+        "Verify your account immediately..."
+    ),
+    height=180,
+    max_chars=5000,
+    key="message_input"
+)
+
+st.button(
+    "🗑️ Clear Message",
+    on_click=clear_message
+)
+
+st.caption(
+    "Your message is analyzed locally by the application. "
+    "Avoid entering real passwords, OTPs, or other sensitive information."
 )
 
 # Analysis button
@@ -46,78 +104,93 @@ if st.button("🔍 Analyze Message", use_container_width=True):
 
         # Run detection engine
         keyword_results = detect_suspicious_keywords(message)
-
         url_results = detect_suspicious_url_patterns(message)
-
         ip_results = detect_ip_based_urls(message)
-
         risk_results = calculate_risk(message)
-
         explanation_results = generate_explanation(message)
 
-        # Display analysis results
+        # Analysis report
         st.divider()
+        st.header("📋 Analysis Report")
 
-        st.header("Analysis Report")
-
-        # Display risk classification
+        # Risk classification
         risk_level = risk_results["risk_level"]
+        risk_score = risk_results["score"]
 
-        if risk_level == "High":
-            st.error("🚨 High Risk Message")
+        with st.container(border=True):
 
-        elif risk_level == "Medium":
-            st.warning("⚠️ Medium Risk Message")
+            st.subheader("🚦 Security Assessment")
 
-        else:
-            st.info("ℹ️ Low Risk - No major indicators detected")
+            if risk_level == "High":
+                st.error(
+                    "🚨 HIGH RISK — Multiple suspicious indicators detected."
+                )
 
-        # Display score and detection counts
-        col1, col2, col3, col4 = st.columns(4)
+            elif risk_level == "Medium":
+                st.warning(
+                    "⚠️ MEDIUM RISK — Some suspicious indicators detected."
+                )
 
-        col1.metric("Risk Score", risk_results["score"])
+            else:
+                st.info(
+                    "ℹ️ LOW RISK — No major indicators detected by current rules."
+                )
 
-        col2.metric("Suspicious Keywords", len(keyword_results))
+            st.metric("Overall Risk Score", risk_score)
 
-        col3.metric("URL Patterns", len(url_results))
+        # Detection metrics
+        st.subheader("📊 Detection Summary")
 
-        col4.metric("IP-Based URLs", len(ip_results))
+        col1, col2, col3 = st.columns(3)
 
-        # Display detected keywords
+        col1.metric("Suspicious Keywords", len(keyword_results))
+        col2.metric("URL Patterns", len(url_results))
+        col3.metric("IP-Based URLs", len(ip_results))
+
+        # Suspicious keywords
         st.subheader("🔎 Detected Suspicious Keywords")
 
         if keyword_results:
             for keyword in keyword_results:
-                st.write(f"⚠️ {keyword}")
+                st.warning(keyword)
         else:
-            st.write("No suspicious keywords detected.")
+            st.success("No suspicious keywords detected.")
 
-        # Display URL patterns
-        st.subheader("🔗 Detected URL Patterns")
+        # URL security analysis
+        st.subheader("🔗 URL Security Analysis")
 
         if url_results:
+            st.markdown("**Suspicious URL patterns detected:**")
+
             for pattern in url_results:
-                st.write(f"⚠️ {pattern}")
+                st.warning(pattern)
+        else:
+            st.success("No suspicious URL patterns detected.")
 
         if ip_results:
-            st.subheader("IP-Based URLs")
+            st.markdown("**IP-Based URLs detected:**")
 
             for ip_url in ip_results:
-                st.write(f"⚠️ {ip_url}")
+                st.warning(ip_url)
         else:
-            st.write("No suspicious URL patterns detected.")
+            st.info("No IP-based URLs detected.")
 
-        # Display explanations
-        st.subheader("🧠 Why Was This Message Flagged?")
+        # Explanations and recommendations
+        col1, col2 = st.columns(2)
 
-        for reason in explanation_results["reasons"]:
-            st.write(f"• {reason}")
+        with col1:
+            with st.container(border=True):
+                st.subheader("🧠 Why Was It Flagged?")
 
-        # Display safety recommendations
-        st.subheader("🛡️ Safety Recommendations")
+                for reason in explanation_results["reasons"]:
+                    st.markdown(f"- {reason}")
 
-        for recommendation in explanation_results["recommendations"]:
-            st.write(f"✅ {recommendation}")
+        with col2:
+            with st.container(border=True):
+                st.subheader("🛡️ Safety Recommendations")
+
+                for recommendation in explanation_results["recommendations"]:
+                    st.markdown(f"- {recommendation}")
 
         st.divider()
 
