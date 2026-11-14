@@ -345,3 +345,71 @@ print("Bank safety recommendation passed!")
 print("Government safety recommendation passed!")
 
 print("All impersonation explanation tests passed!")
+
+print("\nTECHNICAL SUPPORT SCAM KEYWORD TESTS")
+print("------------------------------------")
+
+messages = [
+    "Your computer is infected.",
+    "Your device is infected.",
+    "Virus detected.",
+    "Call technical support.",
+    "Contact technical support.",
+    "Grant remote access.",
+    "Install remote access software.",
+    "Remote access required.",
+    "Microsoft support."
+]
+
+expected_keywords = [
+    "your computer is infected",
+    "your device is infected",
+    "virus detected",
+    "call technical support",
+    "contact technical support",
+    "grant remote access",
+    "install remote access software",
+    "remote access required",
+    "microsoft support"
+]
+
+for message, expected in zip(messages, expected_keywords):
+    result = detect_suspicious_keywords(message)
+
+    assert expected in result
+
+    print(f"Passed: {expected}")
+
+print("All 9 technical support tests passed!")
+
+print("\nTECHNICAL SUPPORT EXPLANATION TESTS")
+print("-----------------------------------")
+
+test_cases = [
+    {
+        "message": "Your computer is infected. Virus detected.",
+        "expected": "fake virus or infection alert"
+    },
+    {
+        "message": "Grant remote access. Install remote access software.",
+        "expected": "remote access to your device"
+    },
+    {
+        "message": "Microsoft support.",
+        "expected": "impersonating Microsoft technical support"
+    }
+]
+
+for test in test_cases:
+    result = generate_explanation(test["message"])
+
+    assert any(
+        test["expected"] in reason
+        for reason in result["reasons"]
+    )
+
+    assert len(result["recommendations"]) > 0
+
+    print(f"Passed: {test['expected']}")
+
+print("All 3 technical support explanation tests passed!")

@@ -34,6 +34,15 @@ SUSPICIOUS_KEYWORDS = [
     "government verification required",
     "government verification",
     "immediate government verification",
+    "your computer is infected",
+    "your device is infected",
+    "virus detected",
+    "call technical support",
+    "contact technical support",
+    "grant remote access",
+    "install remote access software",
+    "remote access required",
+    "microsoft support",
 ]
 
 
@@ -279,7 +288,9 @@ def generate_explanation(message):
             "Contact the organization through its official website or phone number.",
             "Report the suspicious message."
         ])
-        # Bank impersonation warning
+
+    # Bank impersonation warning
+
     if any(
         keyword in keyword_results
         for keyword in [
@@ -293,7 +304,9 @@ def generate_explanation(message):
         recommendations.append(
             "Contact your bank using the phone number on its official website or bank card."
         )
+
 # Government verification warning
+
     if any(
         keyword in keyword_results
         for keyword in [
@@ -325,7 +338,50 @@ def generate_explanation(message):
             "No suspicious indicators from the current detection rules were found."
         )
 
-    # Remove duplicate recommendations while preserving order.
+    # Technical support scam warning
+    if any(
+        keyword in keyword_results
+        for keyword in [
+            "your computer is infected",
+            "your device is infected",
+            "virus detected"
+        ]
+    ):
+        reasons.append(
+            "The message may be using a fake virus or infection alert to frighten the recipient."
+        )
+        recommendations.append(
+            "Do not call phone numbers or follow links from unexpected virus alerts. Use trusted security software to check your device."
+    )
+
+
+    # Remote access warning
+    if any(
+        keyword in keyword_results
+        for keyword in [
+            "grant remote access",
+            "install remote access software",
+            "remote access required"
+        ]
+    ):
+        reasons.append(
+            "The message requests remote access to your device, which could allow an untrusted person to control it."
+        )
+        recommendations.append(
+            "Never grant remote access to someone who contacts you unexpectedly. Verify technical support independently."
+    )
+
+
+# Technical support impersonation warning
+    if "microsoft support" in keyword_results:
+        reasons.append(
+            "The sender may be impersonating Microsoft technical support."
+        )
+        recommendations.append(
+            "Contact Microsoft through its official support website instead of using contact details in the message."
+        )
+
+# Remove duplicate recommendations while preserving order.
     recommendations = list(dict.fromkeys(recommendations))
 
     return {
